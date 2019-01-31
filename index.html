@@ -7,7 +7,7 @@
 </head>
 
 <body>
-    <div class= 'keys'>
+    <div class='keys'>
         <div data-key='37' class='key'>
             <h1>⯇</h>
         </div>
@@ -31,22 +31,82 @@
     <audio data-key='40' src='sounds/OOT_Notes_Ocarina_F_short down.wav'></audio>
     <audio data-key='65' src='sounds/OOT_Notes_Ocarina_D_short a.wav'></audio>
 
+    <audio song-name="correctsong" src='sounds/OOT_Song_Correct.wav'></audio>
+    <audio song-name="wrongsong" src='sounds/OOT_Song_Error.wav'></audio>
+    <audio song-name="zeldaslullaby" src='sounds/25 - Ocarina Zeldas Lullaby.mp3'></audio>
+    <audio song-name="sariassong" src='sounds/34 - Ocarina Sarias Song.mp3'></audio>
+    <audio song-name="eponassong" src='sounds/27 - Ocarina Eponas Song.mp3'></audio>
+    <audio song-name="sunssong" src='sounds/31 - Ocarina Suns Song.mp3'></audio>
+    <audio song-name="songoftime" src='sounds/43 - Ocarina Song Of Time.mp3'></audio>
+    <audio song-name="songofstorms" src='sounds/Song_of_Storms.ogx'></audio>
+
     <script>
-        window.addEventListener('keydown', e => {
+        function playSound(e) {
             const audio = document.querySelector(`audio[data-key="${e.keyCode}"]`);
             const key = document.querySelector(`.key[data-key="${e.keyCode}"]`);
             if (!audio) return;
             audio.currentTime = 0;
             audio.play();
             key.classList.add('playing')
-            const removeTransition = e => {
-               if (e.propertyName !== 'transform') return;
-               key.classList.remove('playing');
-            }
+        }
 
-            const keys = document.querySelectorAll('.key');
-            keys.forEach(key => key.addEventListener('transitionend', removeTransition))
-        });
+        function sequenceDetector(e){
+            sequence.push(e.keyCode);
+
+            
+
+            if (songs.map(song => song.code).includes(sequence.join(''))){
+                let audio = document.querySelector('audio[song-name="correctsong"]')
+                audio.play();
+                audio = document.querySelector(`audio[song-name="${songs.filter(song => song.code === sequence.join(''))[0].song}"]`);
+                audio.play();
+                sequence = [];
+            }else if (sequence.length === 6){
+                const audio = document.querySelector('audio[song-name="wrongsong"]')
+                audio.play();
+                sequence = [];
+            }
+            console.log(sequence);
+        }
+
+        function removeTransition(e) {
+            if (e.propertyName !== 'transform') return;
+            e.target.classList.remove('playing')
+        }
+
+        const songs = [
+         {
+             song: 'zeldaslullaby',
+             code: '373839373839'
+         },
+         {
+             song: 'sariassong',
+             code: '403937403937'
+         },
+         {
+             song: 'eponassong',
+             code: '383739383739'
+         },
+         {
+             song: 'sunssong',
+             code: '394038394039'
+         },
+         {
+             song: 'songoftime',
+             code: '396540396540'
+         },
+         {
+             song: 'songofstorms',
+             code: '654038654038'
+         } 
+         
+        ]
+        let sequence = [];
+
+        window.addEventListener('keydown', playSound);
+        window.addEventListener('keyup', sequenceDetector);
+        window.addEventListener('transitionend', removeTransition);
+
     </script>
 
     <style>
@@ -59,10 +119,10 @@
             overflow: hidden;
         }
 
-        .keys{
+        .keys {
             display: flex;
             height: 100vh;
-            align-items:center;
+            align-items: center;
             justify-content: center;
         }
 
@@ -79,12 +139,11 @@
             opacity: 0.5;
             filter: saturate(40%)
         }
+
         .playing {
             transform: scale(1.1);
             opacity: 1;
             filter: saturate(1)
-            
-
         }
     </style>
 
